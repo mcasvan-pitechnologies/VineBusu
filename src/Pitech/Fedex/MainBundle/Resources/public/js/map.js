@@ -4,6 +4,18 @@
 $(function(){
     var map;
     var markers = 0;
+    var routes;
+    $.ajax({
+        url: $('#getRouteUrl').val(),
+        method: 'GET',
+        contentType: 'application/json; charset=UTF-8',
+        success: function (response) {
+            routes = response;
+
+            initialize();
+            google.maps.event.addDomListener(window, 'load', initialize);
+        }
+    });
     function initialize() {
         var myLatlng = new google.maps.LatLng($('#center_lat').val(),$('#center_long').val());
         var mapOptions = {
@@ -26,7 +38,24 @@ $(function(){
 
         });
 
-        $.ajax({
+        $.each(routes, function(key,item){
+            var flightPlanCoordinates = [];
+            for (var i = 0; i < item.length; i++) {
+                flightPlanCoordinates.push(new google.maps.LatLng(item[i].lat, item[i].lon));
+            }
+
+            var flightPath = new google.maps.Polyline({
+                path: flightPlanCoordinates,
+                geodesic: true,
+                strokeColor: getRandomColor(),
+                strokeOpacity: 1,
+                strokeWeight: 4
+            });
+
+            flightPath.setMap(map);
+            mapsInfoWindow(flightPath, key);
+        });
+        /*$.ajax({
             url: $('#getRouteUrl').val(),
             method: 'GET',
             contentType: 'application/json; charset=UTF-8',
@@ -50,7 +79,7 @@ $(function(){
                 });
 
             }
-        });
+        });*/
 
     }
 
@@ -120,8 +149,9 @@ $(function(){
             cityCircle2.setCenter(event.latLng)
         });
     }
-    //initialize();
-    google.maps.event.addDomListener(window, 'load', initialize);
+
+    /*initialize();
+    google.maps.event.addDomListener(window, 'load', initialize);*/
 
     function do_it(data){
         var marker_name = data[0].name;
