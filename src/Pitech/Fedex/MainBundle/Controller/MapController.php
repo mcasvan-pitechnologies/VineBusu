@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Pitech\Fedex\MainBundle\Entity\Bus;
 use Pitech\Fedex\MainBundle\Entity\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
@@ -44,6 +45,20 @@ class MapController extends Controller
     {
         $kernel = $this->container->get('kernel');
         $path = $kernel->locateResource('@AdmeDemoBundle/path/to/file/Foo.txt');
+    }
+
+    public function getRoutesAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $routes = $em->getRepository('PitechFedexMainBundle:Route')->findAll();
+        $routeCoords = array();
+        foreach($routes as $route){
+           $routeCoords[$route->getBus()->getBusNr()] = $route->getCoords();
+        }
+
+        $response = new JsonResponse($routeCoords,200);
+
+        return $response;
     }
 
     public function parseGPXAction()

@@ -17,3 +17,7 @@ pitech_get_kml:
 pitech_get_kml:
     pattern:  /parse
     defaults: { _controller: PitechFedexMainBundle:Map:parseGPX }
+
+pitech_get_route_coords:
+    pattern:  /getRoutesCoords
+    defaults: { _controller: PitechFedexMainBundle:Map:getRoutes }

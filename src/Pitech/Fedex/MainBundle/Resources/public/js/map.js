@@ -26,8 +26,41 @@ $(function(){
 
         });
 
+        $.ajax({
+            url: $('#getRouteUrl').val(),
+            method: 'GET',
+            contentType: 'application/json; charset=UTF-8',
+            success: function (response) {
+                $.each(response, function(key,item){
+                    var flightPlanCoordinates = [];
+                    for (var i = 0; i < item.length; i++) {
+                        flightPlanCoordinates.push(new google.maps.LatLng(item[i].lat, item[i].lon));
+                    }
+
+                    var flightPath = new google.maps.Polyline({
+                        path: flightPlanCoordinates,
+                        geodesic: true,
+                        strokeColor: getRandomColor(),
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
+                    });
+                    flightPath.setMap(map);
+                });
+
+            }
+        });
 
     }
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.round(Math.random() * 15)];
+        }
+        return color;
+    }
+
     function placeMarker1(location) {
         var clickedLocation = new google.maps.LatLng(location);
         var marker1 = new google.maps.Marker({
