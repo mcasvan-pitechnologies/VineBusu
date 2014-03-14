@@ -3,5 +3,5 @@ pitech_fedex_main_homepage:
     defaults: { _controller: PitechFedexMainBundle:Default:index }
 
 pitech_fedex_main_map:
-    pattern:  /map
-    defaults: { _controller: PitechFedexMainBundle:Map:index }
+    pattern:  /map/{name}
+    defaults: { _controller: PitechFedexMainBundle:Map:getTimes }
