@@ -18,4 +18,3 @@
 /vendor/*
 /composer.phar
 /composer.lock
-/app/bootstrap*
