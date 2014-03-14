@@ -48,7 +48,7 @@ class Route {
     protected $description;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     protected $duration;
 
@@ -58,6 +58,12 @@ class Route {
      */
     protected $stations;
 
+    /**
+     * @ORM\Column(type="array")
+     * @var array
+     */
+    protected $coords;
+
     public function __construct() {
         $this->stations = new ArrayCollection();
     }
@@ -65,7 +71,7 @@ class Route {
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -88,7 +94,7 @@ class Route {
     /**
      * Get judet
      *
-     * @return string 
+     * @return string
      */
     public function getJudet()
     {
@@ -111,7 +117,7 @@ class Route {
     /**
      * Get oras
      *
-     * @return string 
+     * @return string
      */
     public function getOras()
     {
@@ -134,7 +140,7 @@ class Route {
     /**
      * Get description
      *
-     * @return string 
+     * @return string
      */
     public function getDescription()
     {
@@ -157,7 +163,7 @@ class Route {
     /**
      * Get duration
      *
-     * @return integer 
+     * @return integer
      */
     public function getDuration()
     {
@@ -180,7 +186,7 @@ class Route {
     /**
      * Get bus
      *
-     * @return \Pitech\Fedex\MainBundle\Entity\Bus 
+     * @return \Pitech\Fedex\MainBundle\Entity\Bus
      */
     public function getBus()
     {
@@ -213,10 +219,33 @@ class Route {
     /**
      * Get stations
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getStations()
     {
         return $this->stations;
+    }
+
+    /**
+     * Set coords
+     *
+     * @param array $coords
+     * @return Route
+     */
+    public function setCoords($coords)
+    {
+        $this->coords = $coords;
+
+        return $this;
+    }
+
+    /**
+     * Get coords
+     *
+     * @return array
+     */
+    public function getCoords()
+    {
+        return $this->coords;
     }
 }
