@@ -15,5 +15,5 @@ pitech_get_kml:
     defaults: { _controller: PitechFedexMainBundle:Map:getKMLfile }
 
 pitech_get_kml:
-    pattern:  /parse/{filename}
+    pattern:  /parse
     defaults: { _controller: PitechFedexMainBundle:Map:parseGPX }
