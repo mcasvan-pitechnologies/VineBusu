@@ -41,15 +41,28 @@ $(function(){
                         path: flightPlanCoordinates,
                         geodesic: true,
                         strokeColor: getRandomColor(),
-                        strokeOpacity: 1.0,
-                        strokeWeight: 2
+                        strokeOpacity: 1,
+                        strokeWeight: 4
                     });
+
                     flightPath.setMap(map);
+                    mapsInfoWindow(flightPath, key);
                 });
 
             }
         });
 
+    }
+
+    function mapsInfoWindow(polyline, content) {
+        var infowindow = new google.maps.InfoWindow({
+            content: content
+        });
+        google.maps.event.addListener(polyline, 'click', function(event) {
+            infowindow.setPosition(event.latLng);
+            infowindow.position = event.latLng;
+            infowindow.open(map);
+        });
     }
 
     function getRandomColor() {
