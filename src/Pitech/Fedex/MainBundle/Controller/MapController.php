@@ -3,6 +3,8 @@
 namespace Pitech\Fedex\MainBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Response;
 
 class MapController extends Controller
 {
@@ -32,5 +34,9 @@ class MapController extends Controller
         }
         var_dump($times); die;
 
+    public function getKMLfileAction()
+    {
+        $finder = new Finder();
+        var_dump($finder->in(__DIR__));exit();
     }
 }
