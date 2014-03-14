@@ -1,0 +1,7 @@
+parameters:
+#    pitech_fedex_main.example.class: Pitech\Fedex\MainBundle\Example
+
+services:
+#    pitech_fedex_main.example:
+#        class: %pitech_fedex_main.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

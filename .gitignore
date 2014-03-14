@@ -1,13 +1,21 @@
-# Bootstrap
-app/bootstrap*
+/app/cache/*
+/app/logs/*
+/app/config/parameters.yml
+/web/bundles/*
 
-# Symfony directories
-vendor/*
-*/logs/*
-*/cache/*
-web/uploads/*
-web/bundles/*
+/web/css*
+/web/js/*
+/web/images/*
 
-# Configuration files
-app/config/parameters.ini
-app/config/parameters.yml
+*.swp
+*_log
+*~
+
+.idea
+/nbproject/*
+/src/Pitech/Fedex/MainBundle/Resources/config/doctrine/*
+
+/vendor/*
+/composer.phar
+/composer.lock
+/app/bootstrap*

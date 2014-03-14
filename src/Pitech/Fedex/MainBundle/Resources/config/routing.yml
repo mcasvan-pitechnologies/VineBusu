@@ -1,0 +1,3 @@
+pitech_fedex_main_homepage:
+    pattern:  /hello/{name}
+    defaults: { _controller: PitechFedexMainBundle:Default:index }

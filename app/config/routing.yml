@@ -1,0 +1,4 @@
+pitech_fedex_main:
+    resource: "@PitechFedexMainBundle/Resources/config/routing.yml"
+    prefix:   /
+
