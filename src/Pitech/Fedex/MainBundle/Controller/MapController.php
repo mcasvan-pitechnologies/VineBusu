@@ -6,8 +6,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class MapController extends Controller
 {
-    public function indexAction($name)
+    public function indexAction()
     {
-        return $this->render('PitechFedexMainBundle:Map:index.html.twig', array('name' => $name));
+        return $this->render('PitechFedexMainBundle:Map:index.html.twig', array());
+    }
+
+    public function getCoordinatesAction()
+    {
+
     }
 }
