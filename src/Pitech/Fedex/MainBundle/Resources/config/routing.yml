@@ -5,9 +5,11 @@ pitech_fedex_main_homepage:
 pitech_fedex_main_times:
     pattern:  /map/{name}
     defaults: { _controller: PitechFedexMainBundle:Map:getTimes }
+
 pitech_fedex_main_map:
     pattern:  /map
     defaults: { _controller: PitechFedexMainBundle:Map:index }
+
 pitech_get_kml:
     pattern:  /getKml
     defaults: { _controller: PitechFedexMainBundle:Map:getKMLfile }

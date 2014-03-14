@@ -12,6 +12,7 @@ $(function(){
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
+
         google.maps.event.addListener(map, 'click', function(event) {
             if(markers==0)
             {
@@ -24,11 +25,6 @@ $(function(){
             }
 
         });
-        var ctaLayer = new google.maps.KmlLayer({
-            url: 'http://buses.local/getKml'
-        });
-        console.log(ctaLayer);
-        ctaLayer.setMap(map);
 
 
     }
