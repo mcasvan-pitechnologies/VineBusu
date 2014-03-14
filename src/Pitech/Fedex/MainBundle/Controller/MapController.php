@@ -2,9 +2,12 @@
 
 namespace Pitech\Fedex\MainBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
+use Pitech\Fedex\MainBundle\Entity\Bus;
 use Pitech\Fedex\MainBundle\Entity\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class MapController extends Controller
 {
@@ -24,16 +27,16 @@ class MapController extends Controller
                 echo "Error: unexpected fgets() fail\n";
             }
             fclose($handle);
-        }
-        foreach ($array as $rows) {
-            foreach ($rows as $value) {
-                if (trim($value)) {
-                    $times[] = trim($value);
+            foreach ($array as $rows) {
+                foreach ($rows as $value) {
+                    if (trim($value)) {
+                        $times[] = trim($value);
+                    }
                 }
             }
+            return $times;
         }
-        var_dump($times);
-        die;
+        throw new NotFoundResourceException('cannot read times file for ['.$name.']');
     }
 
     public function getKMLfileAction()
@@ -49,32 +52,47 @@ class MapController extends Controller
         if (!$xml = simplexml_load_file($path)) {
             echo 'unable to load XML file';
         } else {
-            $route = new Route();
-            $route->setDescription($filename);
-
-            $coords = array();
-            foreach($xml->children()->rte->rtept as $key => $coord){
-                /** @var $coord \SimpleXMLElement */
-                $tmpCoord = array();
-
-                foreach($coord->attributes() as $key2=>$val2){
-                    /** @var $val2 \SimpleXMLElement */
-                    $tmpCoord[$key2]=(string)$val2;
-                }
-                $coords[] = $tmpCoord;
-            }
-            $route->setOras('Targu Mures');
-            $route->setJudet('Mures');
-            $route->setCoords($coords);
-
+            $busNr = explode('.', $filename)[0];
+            /** @var EntityManager $em */
             $em = $this->getDoctrine()->getManager();
+            $exists = $em->getRepository('PitechFedexMainBundle:Bus')->findOneBy(array('busNr' => $busNr));
+            if($exists == null){
+                $route = new Route();
+                $route->setDescription($filename);
 
-//            $em
+                $coords = array();
+                foreach($xml->children()->rte->rtept as $key => $coord){
+                    /** @var $coord \SimpleXMLElement */
+                    $tmpCoord = array();
 
-            $em->persist($route);
-            $em->flush();
+                    foreach($coord->attributes() as $key2=>$val2){
+                        /** @var $val2 \SimpleXMLElement */
+                        $tmpCoord[$key2]=(string)$val2;
+                    }
+                    $coords[] = $tmpCoord;
+                }
+                $route->setOras('Targu Mures');
+                $route->setJudet('Mures');
+                $route->setCoords($coords);
 
-            return new Response('Route '.$filename . ' was saved.');
+
+                $bus = new Bus();
+                $bus->setBusNr($busNr);
+                $bus->setOrePlecareSaptCapA($this->getTimesAction($busNr.'A'));
+                $bus->setOrePlecareSaptCapB($this->getTimesAction($busNr.'B'));
+                $bus->setRoute($route);
+                $route->setBus($bus);
+
+//            die(var_dump($route));
+
+                $em->persist($route);
+                $em->persist($bus);
+                $em->flush();
+
+                return new Response('Route '.$filename . ' was saved.');
+            }else{
+                return new Response('Route '.$filename . ' already exists.');
+            }
         }
     }
 

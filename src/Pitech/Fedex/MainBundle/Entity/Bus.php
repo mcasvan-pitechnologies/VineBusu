@@ -33,29 +33,33 @@ class Bus {
     protected $route;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="array")
+     * @var array
      */
     protected $orePlecareSaptCapA;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="array")
+     * @var array
      */
     protected $orePlecareWeekCapA;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="array")
+     * @var array
      */
     protected $orePlecareSaptCapB;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="array")
+     * @var array
      */
     protected $orePlecareWeekCapB;
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -78,7 +82,7 @@ class Bus {
     /**
      * Get busNr
      *
-     * @return string 
+     * @return string
      */
     public function getBusNr()
     {
@@ -88,10 +92,10 @@ class Bus {
     /**
      * Set orePlecareSaptCapA
      *
-     * @param string $orePlecareSaptCapA
+     * @param array $orePlecareSaptCapA
      * @return Bus
      */
-    public function setOrePlecareSaptCapA($orePlecareSaptCapA)
+    public function setOrePlecareSaptCapA(array $orePlecareSaptCapA)
     {
         $this->orePlecareSaptCapA = $orePlecareSaptCapA;
 
@@ -101,7 +105,7 @@ class Bus {
     /**
      * Get orePlecareSaptCapA
      *
-     * @return string 
+     * @return string
      */
     public function getOrePlecareSaptCapA()
     {
@@ -111,10 +115,10 @@ class Bus {
     /**
      * Set orePlecareWeekCapA
      *
-     * @param string $orePlecareWeekCapA
+     * @param array $orePlecareWeekCapA
      * @return Bus
      */
-    public function setOrePlecareWeekCapA($orePlecareWeekCapA)
+    public function setOrePlecareWeekCapA(array $orePlecareWeekCapA)
     {
         $this->orePlecareWeekCapA = $orePlecareWeekCapA;
 
@@ -124,7 +128,7 @@ class Bus {
     /**
      * Get orePlecareWeekCapA
      *
-     * @return string 
+     * @return string
      */
     public function getOrePlecareWeekCapA()
     {
@@ -134,10 +138,10 @@ class Bus {
     /**
      * Set orePlecareSaptCapB
      *
-     * @param string $orePlecareSaptCapB
+     * @param array $orePlecareSaptCapB
      * @return Bus
      */
-    public function setOrePlecareSaptCapB($orePlecareSaptCapB)
+    public function setOrePlecareSaptCapB(array $orePlecareSaptCapB)
     {
         $this->orePlecareSaptCapB = $orePlecareSaptCapB;
 
@@ -147,7 +151,7 @@ class Bus {
     /**
      * Get orePlecareSaptCapB
      *
-     * @return string 
+     * @return string
      */
     public function getOrePlecareSaptCapB()
     {
@@ -157,10 +161,10 @@ class Bus {
     /**
      * Set orePlecareWeekCapB
      *
-     * @param string $orePlecareWeekCapB
+     * @param array $orePlecareWeekCapB
      * @return Bus
      */
-    public function setOrePlecareWeekCapB($orePlecareWeekCapB)
+    public function setOrePlecareWeekCapB(array $orePlecareWeekCapB)
     {
         $this->orePlecareWeekCapB = $orePlecareWeekCapB;
 
@@ -170,7 +174,7 @@ class Bus {
     /**
      * Get orePlecareWeekCapB
      *
-     * @return string 
+     * @return string
      */
     public function getOrePlecareWeekCapB()
     {
@@ -193,7 +197,7 @@ class Bus {
     /**
      * Get route
      *
-     * @return \Pitech\Fedex\MainBundle\Entity\Route 
+     * @return \Pitech\Fedex\MainBundle\Entity\Route
      */
     public function getRoute()
     {
