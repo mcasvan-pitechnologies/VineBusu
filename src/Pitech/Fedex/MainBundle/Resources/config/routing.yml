@@ -1,3 +1,7 @@
 pitech_fedex_main_homepage:
     pattern:  /hello/{name}
     defaults: { _controller: PitechFedexMainBundle:Default:index }
+
+pitech_fedex_main_map:
+    pattern:  /map/{name}
+    defaults: { _controller: PitechFedexMainBundle:Map:index }
