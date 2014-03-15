@@ -5,6 +5,19 @@ $(function(){
     var map;
     var markers = 0;
     var routes;
+    var startPos, endPos;
+    var routesContainingStartPos = [];
+    var routesContainingEndPos = [];
+    var validRoutes = [];
+    var polylines = [];
+
+    $.arrayIntersect = function(a, b){
+        return $.grep(a, function(i)
+        {
+            return $.inArray(i, b) > -1;
+        });
+    };
+
     $.ajax({
         url: $('#getRouteUrl').val(),
         method: 'GET',
@@ -17,6 +30,10 @@ $(function(){
         }
     });
     function initialize() {
+        google.maps.Circle.prototype.contains = function(latLng) {
+            return this.getBounds().contains(latLng) && google.maps.geometry.spherical.computeDistanceBetween(this.getCenter(), latLng) <= this.getRadius();
+        }
+
         var myLatlng = new google.maps.LatLng($('#center_lat').val(),$('#center_long').val());
         var mapOptions = {
             zoom: 14,
@@ -28,33 +45,15 @@ $(function(){
         google.maps.event.addListener(map, 'click', function(event) {
             if(markers==0)
             {
-                placeMarker1(event.latLng);
+                placeMarkerStart(event.latLng);
                 markers++;
             }else if(markers==1)
             {
-                placeMarker2(event.latLng);
+                placeMarkerEnd(event.latLng);
                 markers++;
             }
-
         });
 
-        $.each(routes, function(key,item){
-            var flightPlanCoordinates = [];
-            for (var i = 0; i < item.length; i++) {
-                flightPlanCoordinates.push(new google.maps.LatLng(item[i].lat, item[i].lon));
-            }
-
-            var flightPath = new google.maps.Polyline({
-                path: flightPlanCoordinates,
-                geodesic: true,
-                strokeColor: getRandomColor(),
-                strokeOpacity: 1,
-                strokeWeight: 4
-            });
-
-            flightPath.setMap(map);
-            mapsInfoWindow(flightPath, key);
-        });
         /*$.ajax({
             url: $('#getRouteUrl').val(),
             method: 'GET',
@@ -103,9 +102,9 @@ $(function(){
         return color;
     }
 
-    function placeMarker1(location) {
+    function placeMarkerStart(location) {
         var clickedLocation = new google.maps.LatLng(location);
-        var marker1 = new google.maps.Marker({
+        startPos = new google.maps.Marker({
             position: location,
             map: map,
             draggable: true
@@ -121,19 +120,22 @@ $(function(){
             radius: 500
         };
         // Add the circle for this city to the map.
-        cityCircle1 = new google.maps.Circle(circleLocation1);
-        google.maps.event.addListener(marker1,'dragend',function(event){
-            cityCircle1.setCenter(event.latLng)
+        startPos.circle = new google.maps.Circle(circleLocation1);
+        google.maps.event.addListener(startPos,'dragend',function(event){
+            console.log('dragend()');
+            startPos.circle.setCenter(event.latLng);
+            computeRoutes();
         });
     }
-    function placeMarker2(location) {
+
+    function placeMarkerEnd(location) {
         var clickedLocation = new google.maps.LatLng(location);
-        var marker2 = new google.maps.Marker({
+        endPos = new google.maps.Marker({
             position: location,
             map: map,
             draggable: true
         });
-        var circleLocation = {
+        var circleLocation2 = {
             strokeColor: '#0000FF',
             strokeOpacity: 0.8,
             strokeWeight: 2,
@@ -144,9 +146,66 @@ $(function(){
             radius: 500
         };
         // Add the circle for this city to the map.
-        cityCircle2 = new google.maps.Circle(circleLocation);
-        google.maps.event.addListener(marker2,'dragend',function(event){
-            cityCircle2.setCenter(event.latLng)
+        endPos.circle = new google.maps.Circle(circleLocation2);
+        google.maps.event.addListener(endPos,'dragend',function(event){
+            console.log('dragend()');
+            endPos.circle.setCenter(event.latLng);
+            computeRoutes();
+        });
+
+        computeRoutes();
+    }
+
+    // In general, x and y must satisfy (x - center_x)^2 + (y - center_y)^2 < radius^2
+    function computeRoutes(){
+        console.log('computeRoutes()');
+        routesContainingStartPos = [];
+        routesContainingEndPos = [];
+        $.each(routes, function(key,route){
+            $.each(route, function(index, coords){
+                if(startPos.circle.contains(new google.maps.LatLng(coords.lat, coords.lon))){
+                    routesContainingStartPos.push(key);
+                    return false;
+                }
+            });
+
+            $.each(route, function(index, coords){
+                if(endPos.circle.contains(new google.maps.LatLng(coords.lat, coords.lon))){
+                    routesContainingEndPos.push(key);
+                    return false;
+                }
+            });
+        });
+        validRoutes = $.arrayIntersect(routesContainingStartPos, routesContainingEndPos);
+//        console.log(validRoutes);
+
+
+        $.each(polylines, function(index, polyline){
+            polyline.setMap(null);
+            polyline = null;
+        });
+        polylines = [];
+
+
+        $.each(validRoutes, function(key,item){
+//            console.log(eval("routes." + item)); return false;
+            var flightPlanCoordinates = [];
+            for (var i = 0; i < eval("routes." + item).length; i++) {
+                flightPlanCoordinates.push(new google.maps.LatLng(eval("routes." + item)[i].lat, eval("routes." + item)[i].lon));
+            }
+
+            var flightPath = new google.maps.Polyline({
+                path: flightPlanCoordinates,
+                geodesic: true,
+                strokeColor: getRandomColor(),
+                strokeOpacity: 1,
+                strokeWeight: 4
+            });
+            polylines.push(flightPath);
+
+            flightPath.setMap(map);
+            mapsInfoWindow(flightPath, item);
+
         });
     }
 
