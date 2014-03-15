@@ -1,7 +1,12 @@
 {% extends '::base.html.twig' %}
 {% block body %}
-<input type="hidden" id="center_lat" value="46.53959">
-<input type="hidden" id="center_long" value="24.55451">
-<input type="hidden" id="getRouteUrl" value="{{ path('pitech_get_route_coords') }}">
-<div id="map-canvas"></div>
+    <input type="hidden" id="center_lat" value="46.53959">
+    <input type="hidden" id="center_long" value="24.55451">
+    <input type="hidden" id="getRouteUrl" value="{{ path('pitech_get_route_coords') }}">
+            <input type="hidden" value="{{ asset('bundles/pitechfedexmain/images/bus.png') }}" id="busIcon"/>
+    <div id="map-canvas"></div>
+    <p><label>Distance: </label> <span id="distanceVal"></span></p>
+    <p><label>Aprox. time: </label><span id="timeVal"></span></p>
+    <p><label>From: </label> <span id="fromVal"></span></p>
+    <p><label>To: </label><span id="toVal"></span></p>
 {% endblock %}

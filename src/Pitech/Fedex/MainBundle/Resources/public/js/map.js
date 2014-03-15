@@ -4,12 +4,14 @@
 $(function(){
     var map;
     var markers = 0;
-    var routes;
+    var routes, stations;
     var startPos, endPos;
     var routesContainingStartPos = [];
     var routesContainingEndPos = [];
     var validRoutes = [];
     var polylines = [];
+    var busmarkers = [];
+    var infowindows = [];
 
     $.arrayIntersect = function(a, b){
         return $.grep(a, function(i)
@@ -23,8 +25,8 @@ $(function(){
         method: 'GET',
         contentType: 'application/json; charset=UTF-8',
         success: function (response) {
-            routes = response;
-
+            routes = response.routes;
+            stations = response.stations;
             initialize();
             google.maps.event.addDomListener(window, 'load', initialize);
         }
@@ -54,6 +56,23 @@ $(function(){
             }
         });
 
+        /*$.each(routes, function(key,item){
+            var flightPlanCoordinates = [];
+            for (var i = 0; i < item.length; i++) {
+                flightPlanCoordinates.push(new google.maps.LatLng(item[i].lat, item[i].lon));
+            }
+
+            var flightPath = new google.maps.Polyline({
+                path: flightPlanCoordinates,
+                geodesic: true,
+                strokeColor: getRandomColor(),
+                strokeOpacity: 1,
+                strokeWeight: 4
+            });
+
+            flightPath.setMap(map);
+            mapsInfoWindow(flightPath, key);
+        });*/
         /*$.ajax({
             url: $('#getRouteUrl').val(),
             method: 'GET',
@@ -91,6 +110,7 @@ $(function(){
             infowindow.position = event.latLng;
             infowindow.open(map);
         });
+        infowindows.push(infowindow);
     }
 
     function getRandomColor() {
@@ -122,9 +142,9 @@ $(function(){
         // Add the circle for this city to the map.
         startPos.circle = new google.maps.Circle(circleLocation1);
         google.maps.event.addListener(startPos,'dragend',function(event){
-            console.log('dragend()');
             startPos.circle.setCenter(event.latLng);
             computeRoutes();
+            calculateDistance(startPos.position, endPos.position);
         });
     }
 
@@ -148,17 +168,17 @@ $(function(){
         // Add the circle for this city to the map.
         endPos.circle = new google.maps.Circle(circleLocation2);
         google.maps.event.addListener(endPos,'dragend',function(event){
-            console.log('dragend()');
             endPos.circle.setCenter(event.latLng);
             computeRoutes();
+            calculateDistance(startPos.position, endPos.position);
         });
-
+        calculateDistance(startPos.position, endPos.position);
         computeRoutes();
     }
 
     // In general, x and y must satisfy (x - center_x)^2 + (y - center_y)^2 < radius^2
     function computeRoutes(){
-        console.log('computeRoutes()');
+        var new_marker = [];
         routesContainingStartPos = [];
         routesContainingEndPos = [];
         $.each(routes, function(key,route){
@@ -177,7 +197,6 @@ $(function(){
             });
         });
         validRoutes = $.arrayIntersect(routesContainingStartPos, routesContainingEndPos);
-//        console.log(validRoutes);
 
 
         $.each(polylines, function(index, polyline){
@@ -185,13 +204,34 @@ $(function(){
             polyline = null;
         });
         polylines = [];
+        $.each(busmarkers, function(index, marker){
+            marker.setMap(null);
+            marker = null;
+        });
+        busmarkers = [];
+        $.each(infowindows, function(index, infowindow){
+            infowindow.close();
+        });
+        infowindows = [];
 
 
         $.each(validRoutes, function(key,item){
-//            console.log(eval("routes." + item)); return false;
             var flightPlanCoordinates = [];
-            for (var i = 0; i < eval("routes." + item).length; i++) {
-                flightPlanCoordinates.push(new google.maps.LatLng(eval("routes." + item)[i].lat, eval("routes." + item)[i].lon));
+            for (var i = 0; i < routes[item].length; i++) {
+                flightPlanCoordinates.push(new google.maps.LatLng(routes[item][i].lat, routes[item][i].lon));
+            }
+            if(stations[item])
+            {
+                for (var i = 0; i < stations[item].length; i++) {
+                    new_marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(stations[item][i].lat,stations[item][i].lon),
+                        map: map,
+                        title: stations[item][i].name,
+                        icon: $('#busIcon').val()
+                    });
+                    busmarkers.push(new_marker);
+                    mapsInfoWindow(new_marker, stations[item][i].name);
+                }
             }
 
             var flightPath = new google.maps.Polyline({
@@ -207,6 +247,60 @@ $(function(){
             mapsInfoWindow(flightPath, item);
 
         });
+        /*$.each(routes, function(key,item){
+            var flightPlanCoordinates = [];
+            for (var i = 0; i < item.length; i++) {
+                flightPlanCoordinates.push(new google.maps.LatLng(item[i].lat, item[i].lon));
+            }
+
+            var flightPath = new google.maps.Polyline({
+                path: flightPlanCoordinates,
+                geodesic: true,
+                strokeColor: getRandomColor(),
+                strokeOpacity: 1,
+                strokeWeight: 4
+            });
+            polylines.push(flightPath);
+
+            flightPath.setMap(map);
+            mapsInfoWindow(flightPath, key);
+        });*/
+    }
+
+    function calculateDistance(pointA, pointB)
+    {
+        var service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix(
+            {
+                origins: [pointA],
+                destinations: [pointB],
+                travelMode: google.maps.TravelMode.DRIVING,
+                avoidHighways: false,
+                avoidTolls: false
+            }, callback);
+
+    }
+    function callback(response, status) {
+        if (status == google.maps.DistanceMatrixStatus.OK) {
+            var origins = response.originAddresses;
+            var destinations = response.destinationAddresses;
+
+            for (var i = 0; i < origins.length; i++) {
+                var results = response.rows[i].elements;
+                for (var j = 0; j < results.length; j++) {
+                    var element = results[j];
+                    var distance = element.distance.text;
+                    var duration = element.duration.text;
+                    var from = origins[i];
+                    var to = destinations[j];
+                    $('#distanceVal').text(distance);
+                    $('#timeVal').text(duration);
+                    $('#fromVal').text(from);
+                    $('#toVal').text(to);
+                }
+            }
+        }
+
     }
 
     /*initialize();

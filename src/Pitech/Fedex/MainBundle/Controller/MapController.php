@@ -52,11 +52,19 @@ class MapController extends Controller
         $em = $this->getDoctrine()->getManager();
         $routes = $em->getRepository('PitechFedexMainBundle:Route')->findAll();
         $routeCoords = array();
+        $stationCoords = array();
         foreach($routes as $route){
            $routeCoords[$route->getBus()->getBusNr()] = $route->getCoords();
         }
-
-        $response = new JsonResponse($routeCoords,200);
+        $stations = $em->getRepository('PitechFedexMainBundle:Station')->findAll();
+        foreach($stations as $station)
+        {
+            foreach($station->getRoutes() as $route)
+            {
+                $stationCoords[$route->getBus()->getBusNr()][] = array('lat'=>$station->getLatitude(), 'lon'=>$station->getLongitude(), 'name'=>$station->getName());
+            }
+        }
+        $response = new JsonResponse(array('routes'=>$routeCoords,'stations'=>$stationCoords),200);
 
         return $response;
     }
